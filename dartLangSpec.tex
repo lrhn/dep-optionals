@@ -636,7 +636,7 @@ When we say that a function $f_1$ {\em forwards} to another function $f_2$, we m
 \LMLabel{formalParameters}
 
 \LMHash{}
-Every function includes a {\em formal parameter list}, which consists of a list of required positional parameters (\ref{requiredFormals}), followed by any optional parameters (\ref{optionalFormals}). The optional parameters may be specified either as a set of named parameters or as a list of positional parameters, but not both.
+Every function includes a {\em formal parameter list}, which consists of a list of required positional parameters (\ref{requiredFormals}), followed by any optional parameters (\ref{optionalFormals}). The optional parameters may be specified either as a list of positional parameters, a set of named parameters, or both.
 
 \LMHash{}
 The formal parameter list of a function introduces a new scope known as the function's {\em formal parameter scope}. The formal parameter scope of a function $f$  is enclosed in the scope where $f$ is declared.   Every formal parameter introduces a local variable into the formal parameter scope. However, the scope of a function's signature is the function's enclosing scope, not the formal parameter scope.
@@ -672,8 +672,9 @@ It is a compile-time error if a formal parameter is declared as a constant varia
       normalFormalParameter (`,' normalFormalParameter)*
     .
 
-{\bf optionalFormalParameters:}optionalPositionalFormalParameters;
-      namedFormalParameters
+{\bf optionalFormalParameters:}
+      optionalPositionalFormalParameters (`,' namedFormalParameters)?;
+      namedFormalParameters;
     .
 
 {\bf optionalPositionalFormalParameters:}
@@ -3634,11 +3635,6 @@ An evaluated actual argument list $o_1 \ldots o_{m+l}$ derived from an actual ar
 We have an argument list consisting of $m$ positional arguments and $l$ named arguments. We have a function with $h$ required parameters and $k$ optional parameters. The number of positional arguments must be at least as large as the number of required parameters, and no larger than the number of positional parameters. All named arguments must have a corresponding named parameter. You may not provide a given named argument more than once.  If an optional parameter has no corresponding argument, it gets its default value. In checked mode, all arguments must belong to subtypes of the type of their corresponding formal.
 }
 
-\commentary{
-If $l > 0$, then it is necessarily the case that $n = h$, because a method cannot have both optional positional parameters and named parameters.
-}
-
-
 \LMHash{}
 If  $m < h$, or $m > n$, a \cd{NoSuchMethodError} is thrown. Furthermore, each $q_i, 1 \le i \le l$,  must have a corresponding named parameter in the set $\{p_{n+1}, \ldots, p_{n +k}\}$ or a \cd{NoSuchMethodError} is thrown. Then $p_i$ is bound to $o_i, i \in 1.. m$, and $q_j$  is bound to $o_{m+j}, j \in 1.. l$.  All remaining formal parameters of $f$  are bound to their default values. 
 
@@ -3812,14 +3808,16 @@ proceeds as follows:
 First, the expression $o$ is evaluated to a value $v_o$. Next, the argument list $(a_1, \ldots , a_n, x_{n+1}: a_{n+1}, \ldots , x_{n+k}: a_{n+k})$ is evaluated yielding actual argument objects $o_1, \ldots , o_{n+k}$. Let $f$ be the result of looking up (\ref{methodLookup}) method $m$  in $v_o$ with respect to the current library $L$. 
 
 \LMHash{}
-Let $p_1 \ldots p_h$ be the required parameters of $f$,  let $p_1 \ldots p_m$ be the positional parameters of $f$ and let $p_{h+1}, \ldots, p_{h+l}$ be the optional parameters declared by $f$.
+Let $p_1 \ldots p_h$ be the required parametres of $f$,
+let $p_{h+1} \ldots p_{h+l}$ be the optional positional parameters of $f$ and
+let $q_1 \ldots q_m$ be the optional named parameters of $f$.
 
 \commentary{
-We have an argument list consisting of $n$ positional arguments and $k$ named arguments. We have a function with $h$ required parameters and $l$ optional parameters. The number of positional arguments must be at least as large as the number of required parameters, and no larger than the number of positional parameters. All named arguments must have a corresponding named parameter. 
+We have an argument list consisting of $n$ positional arguments and $k$ named arguments. We have a function with $h$ required parameters, $l$ optional positional parameters and $m$ optional named parameters. The number of positional arguments must be at least as large as the number of required parameters of $f$ ($h$), and no larger than the number of allowed positional  parameters ($h+l$). All named arguments must have a corresponding named parameter.
 }
 
 \LMHash{}
-If  $n < h$, or $n > m$, the method lookup has failed. Furthermore, each $x_i, n+1 \le i \le n+k$,  must have a corresponding named parameter in the set $\{p_{m+1}, \ldots, p_{h+l}\}$ or the method lookup also fails.  If $v_o$ is an instance of \code{Type} but $o$ is not a constant type literal, then if $m$ is a method that forwards (\ref{functionDeclarations}) to a static method, method lookup fails. Otherwise method lookup has succeeded.
+If  $n < h$, or $n > h+l$, the method lookup has failed. Furthermore, each $x_i, n+1 \le i \le n+k$,  must have a corresponding named parameter in the set $\{q_1, \ldots, q_m\}$ or the method lookup also fails.  If $v_o$ is an instance of \code{Type} but $o$ is not a constant type literal, then if $m$ is a method that forwards (\ref{functionDeclarations}) to a static method, method lookup fails. Otherwise method lookup has succeeded.
 
 \LMHash{}
 If the method lookup succeeded, the body of $f$ is executed with respect to the bindings that resulted from the evaluation of the argument list, and with \THIS{} bound to $v_o$. The value of $i$ is the value returned after $f$ is executed.
@@ -3917,10 +3915,10 @@ Evaluation of $i$ proceeds as follows:
 
 \LMHash{}
 First, the argument list $(a_1, \ldots , a_n, x_{n+1}: a_{n+1}, \ldots , x_{n+k}: a_{n+k})$ is evaluated  yielding actual argument objects $o_1, \ldots , o_{n+k}$. Let $S$ be the superclass of the immediately enclosing class, and let $f$ be the result of looking up method (\ref{ordinaryInvocation})  $m$ in $S$  with respect to the current library $L$. 
-Let $p_1 \ldots p_h$ be the required parameters of $f$,  let $p_1 \ldots p_m$ be the positional parameters of $f$ and let $p_{h+1}, \ldots, p_{h+l}$ be the optional parameters declared by $f$.
+Let $p_1 \ldots p_h$ be the required parameters of $f$,  let $p_{h+1} \ldots p_{h+l}$ be the optional positional parameters of $f$ and let $q_1, \ldots, q_m$ be the optional named parameters declared by $f$.
 
 \LMHash{}
-If  $n < h$, or $n > m$, the method lookup has failed. Furthermore, each $x_i, n+1 \le i \le n+k$,  must have a corresponding named parameter in the set $\{p_{m+1}, \ldots, p_{h+l}\}$ or the method lookup also fails.  Otherwise method lookup has succeeded.
+If  $n < h$, or $n > h+l$, the method lookup has failed. Furthermore, each $x_i, n+1 \le i \le n+k$,  must have a corresponding named parameter in the set $\{q1, \ldots, q_m\}$ or the method lookup also fails.  Otherwise method lookup has succeeded.
 
 \LMHash{}
 If the method lookup succeeded, the body of $f$ is executed with respect to the bindings that resulted from the evaluation of the argument list, and with \THIS{} bound to the current value of \THIS{}. The value of $i$ is the value returned after $f$ is executed.
@@ -4234,20 +4232,11 @@ The {\em closurization of method $f$ on object $o$} is defined to be equivalent 
 \item $(a, b) \{\RETURN{}$ $u[a] = b;$\} if $f$ is named $[]=$.
 \item  
 \begin{dartCode}
-$(r_1, \ldots, r_n, \{p_1 : d_1, \ldots , p_k : d_k\})$ \{
-  \RETURN{} $ u.m(r_1, \ldots, r_n, p_1: p_1, \ldots, p_k: p_k);$
+$(r_1, \ldots, r_n, \[r_{n+1} = q_1 \ldots r_{n+l} = q_l\], \{p_1 : d_1, \ldots , p_k : d_k\})$ \{
+  \RETURN{} $ u.m(r_1, \ldots, r_{n+l}, p_1: p_1, \ldots, p_k: p_k);$
 \} 
 \end{dartCode}
-if $f$ is named $m$ and has required parameters $r_1, \ldots, r_n$, and named parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
-\item 
-\begin{dartCode}
-$(r_1, \ldots, r_n, [p_1 = d_1, \ldots , p_k = d_k])$\{
-  \RETURN{} $u.m(r_1, \ldots, r_n, p_1, \ldots, p_k)$;
-\}
-\end{dartCode}
-
-if $f$ is named $m$ and has required parameters $r_1, \ldots, r_n$, and optional positional parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
-\end{itemize}
+if $f$ is named $m$ and has required parameters $r_1, \ldots, r_n$, $l$ optional positional parameters, $r_{n+1} \ldots r_{n+l}$ with defaults $q_1 \ldots \q_l$ and named parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
 
 \LMHash{}
 Except that iff  \code{identical($o_1, o_2$)}  then  \cd{$o_1\#m$ == $o_2\#m$},  \cd{$o_1.m$ == $o_2.m$}, \cd{$o_1\#m$ == $o_2.m$} and  \cd{$o_1.m$ == $o_2\#m$}.
@@ -4281,24 +4270,13 @@ One cannot closurize a constructor, getter or a setter via the dot based syntax.
 
 \LMHash{}
 The {\em closurization of constructor $f$ of type $T$} is defined to be equivalent to:
-\begin{itemize}
-\item  
 \begin{dartCode}
-$(r_1, \ldots, r_n, \{p_1 : d_1, \ldots , p_k : d_k\})$ \{
-  \RETURN{} \NEW{} $T.m(r_1, \ldots, r_n, p_1: p_1, \ldots, p_k: p_k);$
+$(r_1, \ldots, r_n, \[r_{n+1} = q_1, \ldots , r_{n+l} = q_l\], \{p_1 : d_1, \ldots , p_k : d_k\})$ \{
+  \RETURN{} \NEW{} $T.m(r_1, \ldots, r_{n+l}, p_1: p_1, \ldots, p_k: p_k);$
 \} 
 \end{dartCode}
 
-if $f$ is a named constructor with name $m$ that has required parameters $r_1, \ldots, r_n$, and named parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
-\item 
-\begin{dartCode}
-$(r_1, \ldots, r_n, [p_1 = d_1, \ldots , p_k = d_k])$\{
-  \RETURN{} \NEW{} $T.m(r_1, \ldots, r_n, p_1, \ldots, p_k)$;
-\}
-\end{dartCode}
-
-if $f$ is a named constructor with name $m$ that has required parameters $r_1, \ldots, r_n$, and optional positional parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
-\end{itemize}
+if $f$ is a named constructor with name $m$ that has required parameters $r_1, \ldots, r_n$, optional positional parameters $r_{n+1}, \ldots, r_{n+l}$ with defaults $q_1, \ldots, q_l$, and named parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
 
 \LMHash{}
 Except that iff  \code{identical($T_1, T_2$)}  then  \cd{\NEW{} $T_1\#m$ == \NEW{} $T_2\#m$}.
@@ -4312,24 +4290,13 @@ The above implies that for non-parameterized types, one can rely on the equality
 
 \LMHash{}
 The {\em closurization of anonymous constructor $f$ of type $T$} is defined to be equivalent to:
-\begin{itemize}
-\item  
 \begin{dartCode}
-$(r_1, \ldots, r_n, \{p_1 : d_1, \ldots , p_k : d_k\})$ \{
-  \RETURN{} \NEW{} $T(r_1, \ldots, r_n, p_1: p_1, \ldots, p_k: p_k);$
+$(r_1, \ldots, r_n, \[r_{n+1} = q_1, \ldots , r_{n+l} = q_l\], \{p_1 : d_1, \ldots , p_k : d_k\})$ \{
+  \RETURN{} \NEW{} $T(r_1, \ldots, r_{n + l}, p_1: p_1, \ldots, p_k: p_k);$
 \} 
 \end{dartCode}
 
-if $f$ is an anonymous constructor that has required parameters $r_1, \ldots, r_n$, and named parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
-\item 
-\begin{dartCode}
-$(r_1, \ldots, r_n, [p_1 = d_1, \ldots , p_k = d_k])$\{
-  \RETURN{} \NEW{} $T(r_1, \ldots, r_n, p_1, \ldots, p_k)$;
-\}
-\end{dartCode}
-
-if $f$ is an anonymous constructor that has required parameters $r_1, \ldots, r_n$, and optional positional parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
-\end{itemize}
+if $f$ is an anonymous constructor that has required parameters $r_1, \ldots, r_n$, optional positional parameters $r_{n + 1}, \ldots , r_{n+l}$ with defaults $q_1, \ldots , q_l$, and named parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
 
 \LMHash{}
 Except that iff  \code{identical($T_1, T_2$)}  then  \cd{\NEW{} $T_1\#$ == \NEW{} $T_2\#$}.
@@ -4349,19 +4316,11 @@ The {\em closurization of method $f$ with respect to superclass $S$} is defined 
 \item $(a, b) \{\RETURN{}$ $\SUPER[a] = b;$\} if $f$ is named $[]=$.
 \item  
 \begin{dartCode}
-$(r_1, \ldots, r_n, \{p_1 : d_1, \ldots , p_k : d_k\})$ \{
-  \RETURN{} \SUPER$.m(r_1, \ldots, r_n, p_1: p_1, \ldots, p_k: p_k);$
+$(r_1, \ldots, r_n, \[r_{n+1}, \ldots , r_{n+l}\], \{p_1 : d_1, \ldots , p_k : d_k\})$ \{
+  \RETURN{} \SUPER$.m(r_1, \ldots, r_{n + l}, p_1: p_1, \ldots, p_k: p_k);$
 \} 
 \end{dartCode}
-if $f$ is named $m$ and has required parameters $r_1, \ldots, r_n$, and named parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
-\item 
-\begin{dartCode}
-$(r_1, \ldots, r_n, [p_1 = d_1, \ldots , p_k = d_k])$\{
-  \RETURN{} \SUPER$.m(r_1, \ldots, r_n, p_1, \ldots, p_k)$;
-\}
-\end{dartCode}
-
-if $f$ is named $m$ and has required parameters $r_1, \ldots, r_n$, and optional positional parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
+if $f$ is named $m$ and has required parameters $r_1, \ldots, r_n$, optional positional parameters $r_{n + 1}, \ldots , r_{n + l}$ with defaults $q_1, \ldots , q_l$, and named parameters $p_1, \ldots, p_k$ with defaults $d_1, \ldots, d_k$.
 \end{itemize}
 
 \LMHash{}

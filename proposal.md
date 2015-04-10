@@ -2,9 +2,9 @@
 
 ## Contact information
 
-Name: Lasse R.H. Nielsen
-E-mail: lrn@google.com
-[DEP Proposal Location][]
+Name: Lasse R.H. Nielsen  
+E-mail: lrn@google.com  
+[DEP Proposal Location][]  
 
 ## Summary
 
@@ -12,7 +12,7 @@ Allow both optional positional and named parameters on the same function.
 Example:
 ```dart
    int parse(String int, [int start, int end],
-             {int radix, void onError(String s)});
+             {int radix, void onError(String source)});
 ```
 
 ## Background and motivation
@@ -74,21 +74,21 @@ Existing libraries will now look badly designed if they are using only one kind 
 Here the isUtc parameter would have been much better as a named parameter. We generally use named parameters for boolean flags, but here it wasn't possible because of the other positional optional parameters.
 ###int/double.parse (dart:core)
 ```dart
-int parse(String source, {int radix, int onError(...));
-double parse(String source, [double onError(...)]);
+int parse(String source, {int radix, int onError(String source));
+double parse(String source, [double onError(String source)]);
 ```
 The signatures already differ in that onError is a positional parameter in one function and a named parameter in the other. That was just bad design. If possible, the onError would likely have been positional in both cases, but should really have been named. Looking forward, it would be useful to allow parsing a sub-string of a larger string, changing the signatures to:
 ```dart
 int parse(String source, [int start = 0, int end],
-                         {int radix, int onError(...));
+                         {int radix, int onError(String source));
 double parse(String source, [int start = 0, int end],
-                            {double onError(...)});
+                            {double onError(String source)});
 ```
 ### Stream.listen (dart:async)
 ```dart
    ... listen(void onData(T data),
-              {void onError(...),
-               void onDone,
+              {void onError(error, StackTrace stackTrace),
+               void onDone(),
                bool cancelOnError: false});
 ```
 Here the onData parameter isn't always necessary (it very often is, but exceptions happen). If possible, it would have been an optional positional parameter, but since it isn't possible, you have to explicitly pass `null` in those cases.
@@ -110,7 +110,7 @@ Runtime implementations must be able to call functions with both kinds of option
 TC52, the Ecma technical committee working on evolving the open [Dart standard][], operates under a royalty-free patent policy, [RFPP][] (PDF). This means if the proposal graduates to being sent to TC52, you will have to sign the Ecma TC52 [external contributer form]() and submit it to Ecma.
 
 [DEP Proposal Location]: https://github.com/lrhn/dep-optionals/
-[changed specification]: https://github.com/lrhn/dep-optionals/dartLangSpec.tex
+[changed specification]: https://github.com/lrhn/dep-optionals/blob/master/dartLangSpec.tex
 [dart standard]: http://www.ecma-international.org/publications/standards/Ecma-408.htm
 [rfpp]: http://www.ecma-international.org/memento/TC52%20policy/Ecma%20Experimental%20TC52%20Royalty-Free%20Patent%20Policy.pdf
 [form]: http://www.ecma-international.org/memento/TC52%20policy/Contribution%20form%20to%20TC52%20Royalty%20Free%20Task%20Group%20as%20a%20non-member.pdf
