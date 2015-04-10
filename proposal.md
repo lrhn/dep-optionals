@@ -74,7 +74,7 @@ Existing libraries will now look badly designed if they are using only one kind 
 Here the isUtc parameter would have been much better as a named parameter. We generally use named parameters for boolean flags, but here it wasn't possible because of the other positional optional parameters.
 ###int/double.parse (dart:core)
 ```dart
-int parse(String source, {int radix, int onError(String source));
+int parse(String source, {int radix, int onError(String source)});
 double parse(String source, [double onError(String source)]);
 ```
 The signatures already differ in that onError is a positional parameter in one function and a named parameter in the other. That was just bad design. If possible, the onError would likely have been positional in both cases, but should really have been named. Looking forward, it would be useful to allow parsing a sub-string of a larger string, changing the signatures to:
