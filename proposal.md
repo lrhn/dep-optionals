@@ -35,7 +35,10 @@ class F implements E {
 
 Currently it is not possible to create a function signature that satisfies both interfaces - even if the interface of E actually contains a function with that signature!
 
-Basically, the restriction is an annoying non-orthogonal design. If adding an extra optional named or positional parameter is always possible, then the function design space would be fully orthogonal, instead of only supporting three of the four quadrants of {no positional, positional} x {no named, named} matrix.
+Some users are recommending to never use optional positional parameters because
+it blocks you from adding more optional parameters later. That can lead to sub-optimal designs where named parameters are used even if optional positional parameters would have better usability, just to keep the door open to later extension.
+
+Basically, the restriction is an annoying non-orthogonal design. If adding an extra optional named or positional parameter is always possible, then the function design space would be fully orthogonal, instead of only supporting three of the four quadrants of {no positional, positional} x {no named, named} matrix. This missing option is affecting API design every day until it is fixed.
 
 ## Proposal
 All function declarations should allow both optional positional and optional named parameters.
