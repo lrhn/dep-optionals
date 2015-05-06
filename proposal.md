@@ -33,7 +33,9 @@ class F implements E {
 }
 ```
 
-Currently it is not possible to create a function signature that satisfies both interfaces - even if the interface of E actually contains a function with that signature!
+Currently it is not possible to create a function signature that satisfies both interfaces - even if the interface of `E` actually contains a function with that signature!
+
+Another use-case is a program transformation that want to add an extra parameter to a function without breaking existing calls. The least intrusive way to do that is to add a named parameter, but if the function already has positional parameters, that approach is blocked.
 
 Some users are recommending to never use optional positional parameters because
 it blocks you from adding more optional parameters later. That can lead to sub-optimal designs where named parameters are used even if optional positional parameters would have better usability, just to keep the door open to later extension.
