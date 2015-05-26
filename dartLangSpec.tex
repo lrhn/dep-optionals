@@ -763,10 +763,13 @@ If a function does not declare a return type explicitly, its return type is \DYN
 Let $F$ be a function with required formal parameters $T_1$ $p_1 \ldots, T_n$ $p_n$, return type $T_0$ and no optional parameters. Then the type of $F$ is $(T_1 ,\ldots, T_n) \rightarrow T_0$.
 
 \LMHash{}
-Let $F$ be a function with required formal parameters $T_1$ $p_1 \ldots, T_n$ $p_n$, return type $T_0$ and positional optional parameters $T_{n+1}$ $p_{n+1}, \ldots, T_{n+k}$ $ p_{n+k}$. Then the type of $F$ is $(T_1 ,\ldots, T_n, [T_{n+1}$ $p_{n+1}, \ldots, T_{n+k}$  $p_{n+k}]) \rightarrow T_0$.
+Let $F$ be a function with required formal parameters $T_1$ $p_1 \ldots, T_n$ $p_n$, return type $T_0$, positional optional parameters $T_{n+1}$ $p_{n+1}, \ldots, T_{n+k}$ $ p_{n+k}$ and no named optional parameters. Then the type of $F$ is $(T_1 ,\ldots, T_n, [T_{n+1}$ $p_{n+1}, \ldots, T_{n+k}$  $p_{n+k}]) \rightarrow T_0$.
 
 \LMHash{}
-Let $F$ be a function with required formal parameters $T_1$ $p_1 \ldots, T_n$ $p_n$, return type $T_0$ and named optional parameters $T_{n+1}$ $p_{n+1}, \ldots, T_{n+k}$ $ p_{n+k}$. Then the type of $F$ is $(T_1 ,\ldots, T_n, \{T_{n+1}$ $p_{n+1}, \ldots, T_{n+k}$  $p_{n+k}\}) \rightarrow T_0$.
+Let $F$ be a function with required formal parameters $T_1$ $p_1 \ldots, T_n$ $p_n$, return type $T_0$, no positional optional parameters and named optional parameters $T_{n+1}$ $p_{n+1}, \ldots, T_{n+k}$ $ p_{n+k}$. Then the type of $F$ is $(T_1 ,\ldots, T_n, \{T_{n+1}$ $p_{n+1}, \ldots, T_{n+k}$  $p_{n+k}\}) \rightarrow T_0$.
+
+\LMHash{}
+Let $F$ be a function with required formal parameters $T_1$ $p_1 \ldots, T_n$ $p_n$, return type $T_0$, positional optional parameters $T_{n+1}$ $p_{n+1}, \ldots, T_{n+k}$ $ p_{n+k}$ and named optional parameters $T_{n+k+1}$ $p_{n+k+1}, \ldots, T_{n+k+m}$ $ p_{n+k+m}$. Then the type of $F$ is $(T_1 ,\ldots, T_n, [\{T_{n+1}$ $p_{n+1}, \ldots, T_{n+k}$  $p_{n+k}], \{T_{n+k+1}$ $p_{n+k+1}, \ldots, T_{n+k+m}$  $p_{n+k+m}\}) \rightarrow T_0$.
 
 \LMHash{}
 The run time type of a function object always implements the class \cd{Function}. 
@@ -3082,16 +3085,16 @@ The class of a function literal implements the built-in class \code{Function}.
 \LMHash{}
 The static type of a function literal of the form 
 
-$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots,  T_{n+k}$ $x_{n+k} = d_k]) => e$ 
+$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots, T_{n+k}$ $x_{n+k} = d_k], \{T_{n+k+1}$ $x_{n+k+1} : d_{k+1}, \ldots,  T_{n+k+m}$ $x_{n+k+m} : d_{k+m}\}) => e$
 is 
 
-$(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}]) \rightarrow T_0$, where $T_0$ is the static type of $e$. 
+$(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}], \{T_{n+k+1}$ $x_{n+1}, \ldots, T_{n+k+m}$ $x_{n+k+m}\})) \rightarrow T_0$, where $T_0$ is the static type of $e$.
 
 \LMHash{}
 The static type of a function literal of the form 
 
-$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots,  T_{n+k}$ $x_{n+k} = d_k])$ \ASYNC{} $=> e$
-is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}]) \rightarrow Future<flatten(T_0)>$, where $T_0$ is the static type of $e$ and  $flatten(T)$ is defined as follows:
+$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots, T_{n+k}$ $x_{n+k} = d_k], \{T_{n+k+1}$ $x_{n+k+1} : d_{k+1}, \ldots,  T_{n+k+m}$ $x_{n+k+m} : d_{k+m}\})$ \ASYNC{} $=> e$
+is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}], \{T_{n+k+1}$ $x_{n+1}, \ldots, T_{n+k+m}$ $x_{n+k+m}\}) \rightarrow Future<flatten(T_0)>$, where $T_0$ is the static type of $e$ and  $flatten(T)$ is defined as follows:
 
  If $T = Future<S>$ then $flatten(T) = flatten(S)$. 
  
@@ -3118,79 +3121,33 @@ Here, a naive definition of $flatten$ diverges; there is not even a fixed point.
 
 }
 
-
 \LMHash{}
-The static type of a function literal of the form 
+The static type of a function literal of the form  
 
-$(T_1$ $a_1, \ldots, T_n$ $a_n, \{T_{n+1}$ $x_{n+1} : d_1, \ldots,  T_{n+k}$ $x_{n+k} : d_k\}) => e$ 
-is 
+$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots, T_{n+k}$ $x_{n+k}= d_k], \{T_{n+k+1}$ $x_{n+k+1} : d_{k+1}, \ldots,  T_{n+k+m}$ $x_{n+k+m} : d_{k+m}\})\{s\}$
 
-$(T_1 \ldots, T_n, \{T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}\}) \rightarrow T_0$, where $T_0$ is the static type of $e$. 
-
-\LMHash{}
-The static type of a function literal of the form 
-
-$(T_1$ $a_1, \ldots, T_n$ $a_n, \{T_{n+1}$ $x_{n+1} : d_1, \ldots,  T_{n+k}$ $x_{n+k} : d_k\})$ \ASYNC{}  $=> e$
-
-is $(T_1 \ldots, T_n, \{T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}\}) \rightarrow Future<flatten(T_0)>$, where $T_0$ is the static type of $e$. 
+is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}], \{T_{n+k+1}$ $x_{n+1}, \ldots, T_{n+k+m}$ $x_{n+k+m}\}) \rightarrow  \DYNAMIC{}$.
 
 \LMHash{}
 The static type of a function literal of the form  
 
-$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots,  T_{n+k}$ $x_{n+k}= d_k])\{s\}$ 
-
-is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}]) \rightarrow  \DYNAMIC{}$.
-
-\LMHash{}
-The static type of a function literal of the form  
-
-$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots,  T_{n+k}$ $x_{n+k}= d_k])$ $ \ASYNC{}$ $\{s\}$ 
-is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}]) \rightarrow Future$. 
+$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots, T_{n+k}$ $x_{n+k}= d_k], \{T_{n+k+1}$ $x_{n+k+1} : d_{k+1}, \ldots,  T_{n+k+m}$ $x_{n+k+m} : d_{k+m}\})$ $ \ASYNC{}$ $\{s\}$
+is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}], \{T_{n+k+1}$ $x_{n+1}, \ldots, T_{n+k+m}$ $x_{n+k+m}\}) \rightarrow Future$.
 
 \LMHash{}
 The static type of a function literal of the form  
 
-$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots,  T_{n+k}$ $x_{n+k}= d_k])$ $ \ASYNC*{}$ $\{s\}$ 
-is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}]) \rightarrow Stream$. 
+$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots, T_{n+k}$ $x_{n+k}= d_k], \{T_{n+k+1}$ $x_{n+k+1} : d_{k+1}, \ldots,  T_{n+k+m}$ $x_{n+k+m} : d_{k+m}\})$ $ \ASYNC*{}$ $\{s\}$
+is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}], \{T_{n+k+1}$ $x_{n+1}, \ldots, T_{n+k+m}$ $x_{n+k+m}\}) \rightarrow Stream$.
 
 \LMHash{}
 The static type of a function literal of the form  
 
-$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots,  T_{n+k}$ $x_{n+k}= d_k])$ $ \SYNC*{}$ $\{s\}$ 
-is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}]) \rightarrow Iterable$. 
-
-
-\LMHash{}
-The static type of a function literal of the form  
-
-$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots,  T_{n+k}$ $x_{n+k}= d_k])\{s\}$ 
-
-is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}]) \rightarrow  \DYNAMIC{}$. 
-
+$(T_1$ $a_1, \ldots, T_n$ $a_n, [T_{n+1}$ $x_{n+1} = d_1, \ldots, T_{n+k}$ $x_{n+k}= d_k], \{T_{n+k+1}$ $x_{n+k+1} : d_{k+1}, \ldots,  T_{n+k+m}$ $x_{n+k+m} : d_{k+m}\})$ $ \SYNC*{}$ $\{s\}$
+is $(T_1 \ldots, T_n, [T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}], \{T_{n+k+1}$ $x_{n+1}, \ldots, T_{n+k+m}$ $x_{n+k+m}\}) \rightarrow Iterable$.
 
 \LMHash{}
-The static type of a function literal of the form  
-
-$(T_1$ $a_1, \ldots, T_n$ $a_n, \{T_{n+1}$ $x_{n+1} : d_1, \ldots,  T_{n+k}$ $x_{n+k} : d_k\})$ $\ASYNC{}$ $\{s\}$
- 
-is $(T_1 \ldots, T_n, \{T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}\}) \rightarrow  Future{}$.
-
-\LMHash{}
-The static type of a function literal of the form  
-
-$(T_1$ $a_1, \ldots, T_n$ $a_n, \{T_{n+1}$ $x_{n+1} : d_1, \ldots,  T_{n+k}$ $x_{n+k} : d_k\})$ $\ASYNC*{}$ $\{s\}$
- 
-is $(T_1 \ldots, T_n, \{T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}\}) \rightarrow  Stream{}$.
-
-\LMHash{}
-The static type of a function literal of the form  
-
-$(T_1$ $a_1, \ldots, T_n$ $a_n, \{T_{n+1}$ $x_{n+1} : d_1, \ldots,  T_{n+k}$ $x_{n+k} : d_k\})$ $\SYNC*{}$ $\{s\}$
- 
-is $(T_1 \ldots, T_n, \{T_{n+1}$ $x_{n+1}, \ldots, T_{n+k}$ $x_{n+k}\}) \rightarrow  Iterable{}$.
-
-\LMHash{}
-In all of the above cases, whenever $T_i, 1 \le i \le n+k$, is not specified, it is considered to have been specified as  \DYNAMIC{}.
+In all of the above cases, whenever $T_i, 1 \le i \le n+k$, is not specified, it is considered to have been specified as  \DYNAMIC{}. If $d_i, 1 \le i \le k+m$ is not specified, it's considered to have been specified as \NULL{}.
 
 
 \subsection{ This}
